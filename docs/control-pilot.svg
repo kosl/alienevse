@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="800"
+   height="300"
+   viewBox="0 0 800 300"
+   font-family="Arial, sans-serif"
+   version="1.1"
+   id="svg191"
+   sodipodi:docname="control-pilot.svg"
+   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview193"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="1.32625"
+     inkscape:cx="680.4901"
+     inkscape:cy="53.157399"
+     inkscape:window-width="1230"
+     inkscape:window-height="747"
+     inkscape:window-x="50"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg191" />
+  <!-- Background -->
+  <rect
+     width="926.44519"
+     height="300"
+     fill="#f8f9fa"
+     id="rect118"
+     x="9.2758169"
+     y="6.0320454"
+     style="stroke-width:1.07613" />
+  <!-- Grid Icon (left) -->
+  <g
+     transform="translate(80,150)"
+     id="g134">
+    <text
+       x="-40"
+       y="-40"
+       font-size="24"
+       fill="#2c3e50"
+       text-anchor="middle"
+       id="text120">Grid</text>
+    <!-- Simple power grid symbol -->
+    <rect
+       x="-40"
+       y="-30"
+       width="80"
+       height="60"
+       rx="10"
+       fill="#3498db"
+       stroke="#2980b9"
+       stroke-width="3"
+       id="rect122" />
+    <line
+       x1="-30"
+       y1="-10"
+       x2="30"
+       y2="-10"
+       stroke="white"
+       stroke-width="4"
+       id="line124" />
+    <line
+       x1="-30"
+       y1="0"
+       x2="30"
+       y2="0"
+       stroke="white"
+       stroke-width="4"
+       id="line126" />
+    <line
+       x1="-30"
+       y1="10"
+       x2="30"
+       y2="10"
+       stroke="white"
+       stroke-width="4"
+       id="line128" />
+    <circle
+       cx="0"
+       cy="25"
+       r="8"
+       fill="white"
+       id="circle130" />
+    <path
+       d="M -15,25 L 0,40 L 15,25"
+       fill="none"
+       stroke="white"
+       stroke-width="4"
+       id="path132" />
+  </g>
+  <!-- Arrow to Charger -->
+  <path
+     d="m 132.10179,151.50801 h 120"
+     stroke="#34495e"
+     stroke-width="4"
+     marker-end="url(#arrowhead)"
+     id="path136" />
+  <!-- Charger Box -->
+  <g
+     transform="translate(340,150)"
+     id="g146">
+    <text
+       x="0"
+       y="-40"
+       font-size="22"
+       fill="#2c3e50"
+       text-anchor="middle"
+       id="text138">Charger</text>
+    <rect
+       x="-80"
+       y="-30"
+       width="160"
+       height="60"
+       rx="15"
+       fill="#e67e22"
+       stroke="#d35400"
+       stroke-width="3"
+       id="rect140" />
+    <path
+       d="M -40,-5 L -20,15 L 0,-5 L 20,15 L 40,-5"
+       fill="none"
+       stroke="white"
+       stroke-width="5"
+       id="path142" />
+    <circle
+       cx="0"
+       cy="20"
+       r="12"
+       fill="white"
+       id="circle144" />
+  </g>
+  <!-- Arrow to AlienEVSE -->
+  <path
+     d="m 423.01602,150.75401 h 92.27205"
+     stroke="#34495e"
+     stroke-width="3.50755"
+     marker-end="url(#arrowhead)"
+     id="path148" />
+  <!-- AlienEVSE Box -->
+  <g
+     transform="translate(600,150)"
+     id="g166">
+    <text
+       x="0"
+       y="-40"
+       font-size="22"
+       fill="#2c3e50"
+       text-anchor="middle"
+       id="text150">AlienEVSE</text>
+    <rect
+       x="-80"
+       y="-30"
+       width="160"
+       height="60"
+       rx="15"
+       fill="#27ae60"
+       stroke="#229954"
+       stroke-width="3"
+       id="rect152" />
+    <!-- Simple alien-inspired icon -->
+    <circle
+       cx="-25"
+       cy="0"
+       r="15"
+       fill="#2ecc71"
+       id="circle154" />
+    <circle
+       cx="25"
+       cy="0"
+       r="15"
+       fill="#2ecc71"
+       id="circle156" />
+    <ellipse
+       cx="0"
+       cy="10"
+       rx="40"
+       ry="25"
+       fill="#2ecc71"
+       id="ellipse158" />
+    <circle
+       cx="-15"
+       cy="-5"
+       r="6"
+       fill="black"
+       id="circle160" />
+    <circle
+       cx="15"
+       cy="-5"
+       r="6"
+       fill="black"
+       id="circle162" />
+    <path
+       d="M -10,20 Q 0,28 10,20"
+       fill="none"
+       stroke="black"
+       stroke-width="3"
+       id="path164" />
+  </g>
+  <!-- Arrow to EV -->
+  <path
+     d="m 687.54006,149.24599 h 80"
+     stroke="#34495e"
+     stroke-width="4"
+     marker-end="url(#arrowhead)"
+     id="path168" />
+  <!-- EV Icon (right) -->
+  <g
+     transform="translate(800,150)"
+     id="g184">
+    <text
+       x="30"
+       y="-40"
+       font-size="24"
+       fill="#2c3e50"
+       id="text170">EV</text>
+    <!-- Simple car symbol -->
+    <rect
+       x="-20"
+       y="-20"
+       width="100"
+       height="40"
+       rx="10"
+       fill="#9b59b6"
+       stroke="#8e44ad"
+       stroke-width="3"
+       id="rect172" />
+    <polygon
+       points="0,-20 20,0 60,0 80,-20"
+       fill="#8e44ad"
+       id="polygon174" />
+    <circle
+       cx="15"
+       cy="20"
+       r="12"
+       fill="#34495e"
+       stroke="#2c3e50"
+       stroke-width="3"
+       id="circle176" />
+    <circle
+       cx="65"
+       cy="20"
+       r="12"
+       fill="#34495e"
+       stroke="#2c3e50"
+       stroke-width="3"
+       id="circle178" />
+    <circle
+       cx="15"
+       cy="20"
+       r="6"
+       fill="#7f8c8d"
+       id="circle180" />
+    <circle
+       cx="65"
+       cy="20"
+       r="6"
+       fill="#7f8c8d"
+       id="circle182" />
+  </g>
+  <!-- Arrowhead definition -->
+  <defs
+     id="defs189">
+    <marker
+       id="arrowhead"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="3"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M0,0 L0,6 L9,3 z"
+         fill="#34495e"
+         id="path186" />
+    </marker>
+  </defs>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none"
+     x="444.86334"
+     y="130.44298"
+     id="text959"><tspan
+       sodipodi:role="line"
+       id="tspan957"
+       x="444.86334"
+       y="130.44298"
+       style="font-size:24px">CP</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none"
+     x="694.43921"
+     y="131.95099"
+     id="text4265"><tspan
+       sodipodi:role="line"
+       id="tspan4263"
+       x="694.43921"
+       y="131.95099"
+       style="font-size:24px">CP</tspan></text>
+</svg>
