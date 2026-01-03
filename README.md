@@ -12,12 +12,19 @@ It requires a simple hardware modification of that can be added to any commercia
 
 ## Theory of operation
 According to EN 61851-1 standard the theory of charger (EVSE) to vehicle (EV) communication is as depicted in the following wiki figure.
+
 <img src="./docs/standard-type2.jpg">
 
 AlienEVSE steps in the middle of above communication and takes over control of the Contol Pilot (CP) signal.
 With CP signal to the Charger it fakes vehicle being connected. AlienEVSE with CP signal to the vehicle (EV) it fakes charger being connected.
+
 <img src="./docs/control-pilot.svg">
-The CP signal is the only thing needed to communicate with 
+
+The CP signal is the only thing needed to communicate with EV and to control charging current with pulse width modulation (PWM) that operates at frequency of 1kHz.
+To generate CP for vehigle and to signal CP to Charger/Wallbox a processor is required with only few additional analog circuits to generate signals ranging from +12 V to -12 V. 
+
+## Implementation
+
 
 [releases-shield]: https://img.shields.io/github/v/release/kosl/alienevse
 [commits-shield]: https://img.shields.io/github/commit-activity/m/kosl/alienevse
