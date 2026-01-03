@@ -15,9 +15,9 @@ According to EN 61851-1 standard the theory of charger (EVSE) to vehicle (EV) co
 <img src="./docs/standard-type2.jpg">
 
 AlienEVSE steps in the middle of above communication and takes over control of the Contol Pilot (CP) signal.
-With CP signal to the Charger it fakes vehicle being connected. AlienEVSE with CP signal to vehicle it fakes charger being connected.
+With CP signal to the Charger it fakes vehicle being connected. AlienEVSE with CP signal to the vehicle (EV) it fakes charger being connected.
 <img src="./docs/control-pilot.svg">
-
+The CP signal is the only thing needed to communicate with 
 
 [releases-shield]: https://img.shields.io/github/v/release/kosl/alienevse
 [commits-shield]: https://img.shields.io/github/commit-activity/m/kosl/alienevse
