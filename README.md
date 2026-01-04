@@ -4,7 +4,7 @@
 [![Platform][platform-shield]](https://github.com/esphome)
 
 This project [kosl/alienevse](https://github.com/kosl/alienevse) lets you use an ESP32 device to manage charging any vehicle with [ESPHome](https://esphome.io). 
-It requires a simple hardware modification of that can be added to any commercial charging station and provides ESPHome EVSE addon that can control charging by dynamically control charging current while charging and schedule charging availability when at car connected. With [Home Assistant](https://www.home-assistant.io) automation it can follow available power from solar inverter or to follow grid peak shaving, multiple cars power balancing and other tarif requirements.
+It requires a simple hardware modification that can be added to any commercial charging station and provides ESPHome EVSE addon that can control charging by dynamically setting charging current, while charging and can schedule charging availability if car is connected. With [Home Assistant](https://www.home-assistant.io) automation it can follow available power from solar inverter or follow grid peak shaving, multiple cars power balancing and other tarif requirements.
  
 | Controls | Sensors | Diagnostic |
 | - | - | - |
@@ -24,7 +24,7 @@ According to EN 61851-1 standard the theory of charger (EVSE) to vehicle (EV) co
 
 <img src="./docs/standard-type2.jpg">
 
-AlienEVSE steps in the middle of above communication and takes over control of the Contol Pilot (CP) signal.
+AlienEVSE steps in the middle of above communication and takes over control of the Control Pilot (CP) signal.
 With CP signal to the Charger it fakes vehicle being connected. AlienEVSE with CP signal to the vehicle (EV) it fakes charger being connected.
 
 <img src="./docs/control-pilot.svg">
@@ -51,14 +51,14 @@ Duty cycle is valid only in States B, C, D
 |           <10% | Not valid / no charging            |
 
 ## Implementation
-For CP signaling the cheapest ESP32-C3 module (€2.5-€4) and some resistors, 2 transistors and operational amplifier are required.
-Compete cost is under €10. It can be protyped on a thru-hole board of 3x5 cm dimension as shown below.
-| AlienEVSE board with ESP32-C3 supermini | Installed under cover | Wallbox |
+For CP signaling the cheapest ESP32-C3 Super Mini module (€2.5-€4), some resistors, 2 transistors, and operational amplifier are required.
+Compete cost is under €10. It can be protyped on a 3x5 cm thru-hole board as shown below.
+| AlienEVSE board with ESP32-C3 Super Mini | Installed under cover | Wallbox |
 | - | - | - |
 | <img src="./photos/20260103_142043.jpg"> | <img src="./photos/20260103_151713.jpg"> | <img src="./photos/20260103_151722.jpg"> |
 
 ### Schematics
-| CPU (ESP32-C3 supermini) | Charger CP control | EV CP control |
+| CPU (ESP32-C3 Super Mini) | Charger CP control | EV CP control |
 | - | - | - |
 | <img src="./docs/schematics-cpu.png"> | <img src="./docs/schematics-cp-charger.png"> | <img src="./docs/schematics-cp-ev.png"> |
 
@@ -69,25 +69,26 @@ Complete schematics and board are available under [schematics/](./schematics/).
 | CP_CH_OUT_B | GPIO7 | (digital out) | Signal to charger that EV is connected |
 | CP_CH_OUT_C | GPIO6 | (digital out) | Signal to charger that EV is requesting charging |
 | CP_EV_IN | GPIO0 | (ADC) |  Measuring raw (including PWM) voltage at CP connected to EV |
-| CP_EV_OUT | GPIO10 | (PWM out) | Generating PWM signal for EV that is amplified to +- 12 V |
+| CP_EV_OUT | GPIO10 | (PWM out) | Generating PWM signal for EV that is amplified to ±12 V |
 | CC_L1 | GPIO2 | (ADC) | Current clamp (CC) input (optional) for measuring Line 1 current |
 | CC_L2 | GPIO3 | (ADC) | Current clamp (CC) input (optional) for measuring Line 2 current |
 | CC_L3 | GPIO4 | (ADC) | Current clamp (CC) input (optional) for measuring Line 3 current |
 
-### What Charger?
+If external antenna is required then [ESP32-C3 Super Mini Plus](https://www.espboards.dev/esp32/esp32-c3-super-mini-plus/) can be used instead of [antenna modification](https://peterneufeld.wordpress.com/2025/03/04/esp32-c3-supermini-antenna-modification/) on general-purpose [ESP32-C3 Super Mini](https://www.espboards.dev/esp32/esp32-c3-super-mini/) proposed here. There are other ESP32 super mini options [explainded here](https://www.espboards.dev/blog/esp32-super-mini-comparison/) if additional capabilities (e.g. more ADCs for internal and external CTs, Wi-Fi 6, LCD display) are required.
 
+### Which Charger is compatible?
 
-What charger can be used for this modification. We recommend the cheapest one without WiFi that has required power rating and safety protection including display showing measured current. Some shown below can be found for under €130 for 3 phase 11 kW Type 2 charger that is most comonly used in EU cars.   
+What charger can be used for this modification? We recommend the cheapest one without WiFi that has required power rating and safety protection including display showing measured current. Some chargers shown below can be found for under €130 for 3 phase 11 kW Type 2 that are most commonly used in EU cars. One phase chargers are even cheaper and easier to modify as they have less components inside.
 
-| Aandaiic | Feyree | Kolanky |
+| Andaiic | Feyree | Kolanky |
 |-|-|-|
 |<img src="./docs/charger-andaiic.png"> | <img src="./docs/charger-feyree.png"> | <img src="./docs/charger-kolanky.png"> |
 
 ### Locating connections points inside a charger
 
 There are several wires (up to 9) wires required to be soldered to existing charger. Most of them can be spotted by observing the PCB of the charger. 
-The easiest in to spot tiny CP wire coming from the PCB to the EV charging cable. That CP wire is to be disconnected and AlienEVSE CP control wil be put in the middle. 
-Note that usualy there is no Proximity Pilot (PP) wire going to the plug as the resistor rescribing cable strength is  installed in the handle directly to save on costs of the PP wire.  
+The easiest is to spot tiny CP wire coming from the PCB to the EV charging cable. That CP wire is to be disconnected and AlienEVSE CP control will be put in the middle. 
+Note that usually there is no Proximity Pilot (PP) wire going to the plug as the resistor describing cable strength is  installed in the handle directly to save on costs of the PP wire.  
 | Wire name | Location | 
 |-----------|----------|
 | GND   | Ground is the largest area on the PCB being also around the PCB mounting holes |
@@ -97,17 +98,17 @@ Note that usualy there is no Proximity Pilot (PP) wire going to the plug as the 
 | +3.3V | Alternatively, +3.3 V can be used for powering ESP32.*  |
 | CP    | Going to the charging cable. Break this wire and connect CP_CH and CP_EV signals in between |
 | CC_L1 | If there are current transformers (CT have usually ratio 1000:1) connect to the live wire.** |
-| CC_L2 | As with CC_L1 the CT can be attached to charger's sensor in paralle without affecting measurements.** |
+| CC_L2 | As with CC_L1 the CT can be attached to charger's sensor in parallel without affecting measurements.** |
 | CC_L3 | All CC lines can be omitted or connected to external CTs for measuring complete grid |
 
-*Note that 100 nF blocking capatitors are required on AlienEVSE board to block interference.
+*Note that 100 nF blocking capacitors are required on AlienEVSE board to block interference.
 
 **Live wire can be found with multimeter when charging. There will be some positive (DC) offset to allow negative CT current. 
-When measuting AC voltage (200 mV to 2V range) on one or another wire (eg. red or black) then one will show some AC voltage while another will be zero. Use that show some AC voltage proportional to charging current. 
+When measuring AC voltage (200 mV to 2V range) on one or another wire (eg. red or black) then one will show some AC voltage while another will be zero. Use that show some AC voltage proportional to charging current. 
 
 ### Testing
 
-Prototype board can be easily tested without EV and charger provided +12 V and -12 V voltages for supply, while boarc can be powered though USB used for programming the ESP32-C3 module. Tor testing connect CP_CH and CP_EV wires together and simulate EV states by `CP_CH_OUT_B` and `CP_CH_OUT_C` signals. Note that charging logic inside `evse_update_state_script` needs to return early without changing `CP_CH_OUT_B` and `CP_CH_OUT_C` signals at the end of the `evse_update_state_script`.
+Prototype board can be easily tested without EV and charger provided +12 V and -12 V voltages for supply, while board can be powered though USB used for programming the ESP32-C3 module. Tor testing connect CP_CH and CP_EV wires together and simulate EV states by `CP_CH_OUT_B` and `CP_CH_OUT_C` signals. Note that charging logic inside `evse_update_state_script` needs to return early without changing `CP_CH_OUT_B` and `CP_CH_OUT_C` signals at the end of the `evse_update_state_script`.
 
 ## ESPHome software
 
@@ -133,27 +134,27 @@ How it works (important for tuning):
 
 ```yaml
 evse_cp_sampler:
-	id: <id>                                  # required
-	pwm_interrupt_pin: <internal gpio pin>     # required
-	sample_adc: <adc_sensor_id>               # required
+    id: <id>                                  # required
+    pwm_interrupt_pin: <internal gpio pin>     # required
+    sample_adc: <adc_sensor_id>               # required
 
-	# Optional behavior/timing
-	samples: 250                               # optional, default: 250
+    # Optional behavior/timing
+    samples: 250                               # optional, default: 250
 
-	# Optional triggers
-	on_raw_value:                              # optional
-		- ...                                    # x is int (median-filtered raw ADC count)
-	on_state_change:                           # optional
-		- ...                                    # x is int state code: 0 unknown, 1 A, 2 B, 3 C, 4 E/F
+    # Optional triggers
+    on_raw_value:                              # optional
+    	- ...                                    # x is int (median-filtered raw ADC count)
+    on_state_change:                           # optional
+    	- ...                                    # x is int state code: 0 unknown, 1 A, 2 B, 3 C, 4 E/F
 
-	# Optional state thresholds (raw ADC counts)
-	state_a_threshold: 4000                    # optional, default: 4000 (A if value > this)
-	state_b_value: 3650                        # optional, default: 3650 (B if |value - this| < state_b_threshold)
-	state_b_threshold: 150                     # optional, default: 150
-	state_c_value: 3200                        # optional, default: 3200 (C if |value - this| < state_c_threshold)
-	state_c_threshold: 150                     # optional, default: 150
-	state_e_value: 755                         # optional, default: 755 (E/F if |value - this| < state_e_threshold)
-	state_e_threshold: 150                     # optional, default: 150
+    # Optional state thresholds (raw ADC counts)
+    state_a_threshold: 4000                    # optional, default: 4000 (A if value > this)
+    state_b_value: 3650                        # optional, default: 3650 (B if |value - this| < state_b_threshold)
+    state_b_threshold: 150                     # optional, default: 150
+    state_c_value: 3200                        # optional, default: 3200 (C if |value - this| < state_c_threshold)
+    state_c_threshold: 150                     # optional, default: 150
+    state_e_value: 755                         # optional, default: 755 (E/F if |value - this| < state_e_threshold)
+    state_e_threshold: 150                     # optional, default: 150
 ```
 
 Notes on the required fields:
