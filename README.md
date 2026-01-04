@@ -175,7 +175,9 @@ Recommended tuning workflow:
 	 - `state_*_threshold` to a margin that covers noise/variation but is small enough not to overlap adjacent states.
 	 - `state_a_threshold` to a value safely above your highest observed B value (A is the only state detected as “greater than”).
 
+## License
 
+Open source under GPLv3/CERN-OHL-S; commercial licenses available—contact [wigaun]@gmail.com. Harmony CLA for all PRs.
 
 [releases-shield]: https://img.shields.io/github/v/release/kosl/alienevse
 [commits-shield]: https://img.shields.io/github/commit-activity/m/kosl/alienevse
