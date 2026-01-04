@@ -6,8 +6,8 @@ esphome:
       - output.set_level:
           id: cp_ev_out_pwm
           level: "100%"
-      - output.turn_on: cp_ch_out_b_out
-      - output.turn_on: cp_ch_out_c_out
+      - output.turn_off: cp_ch_out_b_out
+      - output.turn_off: cp_ch_out_c_out
 
 esp32:
   board: esp32-c3-devkitc-02
@@ -23,33 +23,28 @@ logger:
 
 api:
   encryption:
-    key: "P4uQsJqmSpK6p5UI03a4jp6D4Js+j048IfbHy371h0I="
+    key: !secret alienevse_api_encryption_key
 
 ota:
   - platform: esphome
-    password: "d4e0fb819ac7a260e2e2fc0c80627a5d"
+    password: !secret alienevse_ota_password
 
 wifi:
   networks:
-    - ssid: !secret wifi_mansarda_ssid
+    - ssid: !secret wifi_ssid
       password: !secret wifi_password
-    - ssid: !secret wifi_eteradxa_ssid
-      password: !secret wifi_eteradxa_password
   output_power: 8.5dB
   power_save_mode: none  # Better reliability over power saving
 
   ap:
     ssid: "AlienEVSE Fallback Hotspot"
-    password: "ikyY62YLDjVE"
+    password: !secret alienevse_ap_password
 
 captive_portal:
 
 external_components:
-  - source:
-      type: local
-      path: custom_components
-    components:
-      - evse_cp_sampler
+  - source: github://kosl/alienevse
+    components: [ evse_cp_sampler ]
 
 # - CP_CH_IN   GPIO1 (ADC)
 # - CP_CH_OUT_B GPIO7 (digital out)
@@ -60,18 +55,14 @@ external_components:
 # - CC_L2      GPIO3 (ADC)
 # - CC_L3      GPIO4 (ADC)
 
+# Enable built-in status LED on GPIO8
 light:
   - platform: status_led
-    name: "Status LED"
     id: esp_status_led
-    icon: "mdi:alarm-light"
     pin:
       number: GPIO8
       inverted: true
       ignore_strapping_warning: true 
-    entity_category: diagnostic
-    restore_mode: ALWAYS_OFF
-
 
 output:
   - platform: gpio
@@ -84,7 +75,9 @@ output:
 
   - platform: ledc
     id: cp_ev_out_pwm
-    pin: GPIO10
+    pin:
+      number: GPIO10
+      allow_other_uses: true
     frequency: 1000Hz # default
 
 globals:
@@ -101,7 +94,7 @@ switch:
     name: "Charging Enabled"
     id: charging_enabled
     optimistic: True
-    restore_mode: ALWAYS_OFF
+    restore_mode: RESTORE_DEFAULT_OFF
     on_state:
       then:
         - script.execute: evse_update_state_script
@@ -131,6 +124,9 @@ text_sensor:
 # Heartbeat sampling at 500 Hz in DC mode (when PWM is disabled) 
 evse_cp_sampler:
     id: cp_sampler
+    pwm_interrupt_pin:
+      number: GPIO10
+      allow_other_uses: true
     sample_adc: cp_ev_in
     samples: 250
     on_raw_value:
@@ -177,7 +173,7 @@ script:
                   duty = 100.0;
                   id(charging_state).publish_state("C2 (charging disabled)");
                 }
-                relay_b = relay_c = true;
+                relay_b = true; relay_c = enabled;
               break;
             default:
               ESP_LOGE("update_state_script", "State %d occured");
@@ -190,6 +186,7 @@ script:
             state, enabled, amps, duty, relay_b, relay_c);
 
 sensor:
+  # =========== EVSE Control Pilot sensors ===========
   # - platform: adc
   #   id: cp_ch_in
   #   pin: GPIO1  
@@ -207,6 +204,7 @@ sensor:
   #   filters:
   #     - throttle: 1s
     
+  # =========== Vehicle Control Pilot sensors ===========
   - platform: adc
     id: cp_ev_in
     pin: GPIO0
@@ -222,46 +220,65 @@ sensor:
     update_interval: never
 
   # =========== Current sensors ===========
-
   - platform: adc
     id: cc_l1
     pin: GPIO2
-    attenuation: 12db
+    attenuation: 6db
   - platform: ct_clamp
     sensor: cc_l1
     name: "L1 Current"
-    update_interval: 2s
-    # filters:
-    #   - calibrate_linear:        
-    #       - 0 -> 0
-    #       - 1.0 -> 16.0
+    update_interval: 1s
+    filters:
+      - median:
+      - calibrate_linear:
+          method: exact
+          datapoints:
+           - 0.0390 -> 0.0
+           - 0.0630 -> 5.0
+           - 0.1184 -> 11.0
+           - 0.1665 -> 16.0
+      - clamp:
+          min_value: 0.0
   - platform: adc
     id: cc_l2
     pin: GPIO3
-    attenuation: 12db
+    attenuation: 6db
   - platform: ct_clamp
     sensor: cc_l2
     name: "L2 Current"
-    update_interval: 2s
-    # filters:
-    #   - calibrate_linear:        
-    #       - 0 -> 0
-    #       - 1.0 -> 16.0
+    update_interval: 1s
+    filters:
+      - median
+      - calibrate_linear:
+          method: exact
+          datapoints:
+           - 0.0380 -> 0.0
+           - 0.0611 -> 5.0
+           - 0.1167 -> 11.0
+           - 0.1646 -> 16.0
+      - clamp:
+          min_value: 0.0
   - platform: adc
     id: cc_l3
     pin: GPIO4
-    attenuation: 12db
+    attenuation: 6db
   - platform: ct_clamp
     sensor: cc_l3
     name: "L3 Current"
-    update_interval: 2s
-    # filters:
-    #   - calibrate_linear:        
-    #       - 0 -> 0
-    #       - 1.0 -> 16.0
-
+    update_interval: 1s
+    filters:
+      - median
+      - calibrate_linear:
+          method: exact
+          datapoints:
+           - 0.0380 -> 0.0
+           - 0.0607 -> 5.0
+           - 0.1160 -> 11.0
+           - 0.1644 -> 16.0
+      - clamp:
+          min_value: 0.0
+  
   # =========== Diagnostic sensors ===========
-
   - platform: template
     name: "PWM Duty"
     id: pwm_duty

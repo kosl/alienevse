@@ -38,12 +38,14 @@ void CpSampler::setup() {
   };
   esp_timer_create(&heartbeat_args, &heartbeat_timer_);
 
+  gpio_num_t isr_pin = static_cast<gpio_num_t>(pwm_interrupt_pin_);
+
   // PWM GPIO interrupt setup (rising edge on GPIO10)
   // https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/peripherals/gpio.html
-  gpio_set_intr_type(PWM_PIN, GPIO_INTR_POSEDGE);
+  gpio_set_intr_type(isr_pin, GPIO_INTR_POSEDGE);
   gpio_install_isr_service(0);
-  gpio_isr_handler_add(PWM_PIN, gpio_isr_handler, this);
-  gpio_intr_enable(PWM_PIN);  
+  gpio_isr_handler_add(isr_pin, gpio_isr_handler, this);
+  gpio_intr_enable(isr_pin);  
   
   // Start heartbeat (periodic) timer immediately
   esp_timer_start_periodic(heartbeat_timer_, 2000);  // 2000 µs = 500 Hz
@@ -132,13 +134,13 @@ void IRAM_ATTR CpSampler::timer_callback(void *arg) {
 
   // --- State detection based on median-filtered value ---
   int new_state = 0;
-  if (filtered_value > 4000) {
+  if (filtered_value > self->state_a_thr_) {
     new_state = 1;           // +12V → State A (no vehicle)
-  } else if (abs(filtered_value - 3650) < 150) {
+  } else if (abs(filtered_value - self->state_b_val_) < self->state_b_thr_) {
     new_state = 2;           // +9V  → State B (connected, not ready)
-  } else if (abs(filtered_value - 3200) < 150) {
+  } else if (abs(filtered_value - self->state_c_val_) < self->state_c_thr_) {
     new_state = 3;           // +6V  → State C (charging)
-  } else if (abs(filtered_value - 755) < 150) {
+  } else if (abs(filtered_value - self->state_e_val_) < self->state_e_thr_) {
     new_state = 4;           // -12V → State E/F (error or ventilation)
   }
 
@@ -152,11 +154,15 @@ void IRAM_ATTR CpSampler::timer_callback(void *arg) {
 
 void CpSampler::dump_config() {
   ESP_LOGCONFIG(TAG, "EVSE CP Sampler:");
-  ESP_LOGCONFIG(TAG, "  PWM on GPIO10");
+  ESP_LOGCONFIG(TAG, "  PWM Interrupt on GPIO: %d", pwm_interrupt_pin_);
   ESP_LOGCONFIG(TAG, "  ADC Sensor: %s", adc_sensor_ != nullptr ? adc_sensor_->get_name().c_str() : "None");
   ESP_LOGCONFIG(TAG, "  Samples per update: %d", samples_);
   ESP_LOGCONFIG(TAG, "  Median filter window: %d", MEDIAN_WINDOW);
   ESP_LOGCONFIG(TAG, "  Decimation factor: %d", DECIMATE_SAMPLES);
+  ESP_LOGCONFIG(TAG, "  State A : > %d", state_a_thr_);
+  ESP_LOGCONFIG(TAG, "  State B : %d ± %d", state_b_val_, state_b_thr_);
+  ESP_LOGCONFIG(TAG, "  State C : %d ± %d", state_c_val_, state_c_thr_);
+  ESP_LOGCONFIG(TAG, "  State E/F : %d ± %d", state_e_val_, state_e_thr_);
 }
 
 }  // namespace evse_cp_sampler
