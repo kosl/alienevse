@@ -124,15 +124,40 @@ text_sensor:
 # Heartbeat sampling at 500 Hz in DC mode (when PWM is disabled) 
 evse_cp_sampler:
     id: cp_sampler
+    # REQUIRED: this must be the same pin that generates the EV CP PWM (LEDC output).
+    # The component attaches a rising-edge interrupt to time the ADC sample shortly after the edge.
     pwm_interrupt_pin:
       number: GPIO10
       allow_other_uses: true
+
+    # REQUIRED: ADC sensor id to sample. The component forces single-sample raw reads and disables
+    # the ADC sensor's periodic updates.
     sample_adc: cp_ev_in
-    samples: 250
+
+    # OPTIONAL: number of internal sampler ticks per update (trade latency vs stability).
+    # Higher = more stable but slower; lower = quicker but noisier.
+    # samples: 250
+
+    # OPTIONAL: state thresholds (raw ADC counts). Defaults shown below.
+    # Tune these if your analog front-end / ADC attenuation differs:
+    # - Log 'on_raw_value' while forcing each CP state, then set *_value to the observed centers.
+    # - Set *_threshold wide enough for noise but not so wide that states overlap.
+    # state_a_threshold: 4000
+    # state_b_value: 3650
+    # state_b_threshold: 150
+    # state_c_value: 3200
+    # state_c_threshold: 150
+    # state_e_value: 755
+    # state_e_threshold: 150
+
+    # Called with x = median-filtered raw ADC count (int)
     on_raw_value:
       - lambda: |-
           id(last_raw_adc_count) = x;
           // ESP_LOGD("evse_cp_sampler", "Raw ADC count: %d", x);         
+
+    # Called when the classified state changes. x values:
+    # 0=unknown, 1=A, 2=B, 3=C, 4=E/F
     on_state_change:
       - lambda: |-
           ESP_LOGD("evse_cp_sampler", "New state: %d", x);
@@ -208,9 +233,8 @@ sensor:
   - platform: adc
     id: cp_ev_in
     pin: GPIO0
+    # Important that the attenuation is 12db to cover full CP voltage range
     attenuation: 12db
-    internal: True
-    update_interval: never
 
   - platform: template
     name: "Vehicle CP ADC"
@@ -220,6 +244,8 @@ sensor:
     update_interval: never
 
   # =========== Current sensors ===========
+  # To get accurate current readings, you must recalibrate these sensors for your
+  # specific CT clamps and wiring setup. The provided datapoints are an example
   - platform: adc
     id: cc_l1
     pin: GPIO2

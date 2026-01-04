@@ -119,6 +119,62 @@ local/bin/esphome compile alienevse.yaml
 local/bin/esphome upload alienevse.yaml
 ~~~
 
+### `evse_cp_sampler` component
+
+This repository includes a custom ESPHome component `evse_cp_sampler` that samples the EV Control Pilot (CP) voltage at a precise time relative to the PWM rising edge, then classifies the CP state (A/B/C/E) based on configurable ADC thresholds.
+
+How it works (important for tuning):
+- When PWM is running, the component arms a one-shot timer on each PWM rising edge and samples the configured ADC shortly after that edge.
+- When PWM is not transitioning (100% DC or disabled), it falls back to a heartbeat sampler (~500 Hz).
+- Samples are decimated and then median-filtered (internal window of 20). The `on_raw_value` callback receives this median-filtered ADC raw count.
+- State classification runs on the same filtered value and emits `on_state_change` only when the classified state changes.
+
+#### Configuration schema (required / optional / defaults)
+
+```yaml
+evse_cp_sampler:
+	id: <id>                                  # required
+	pwm_interrupt_pin: <internal gpio pin>     # required
+	sample_adc: <adc_sensor_id>               # required
+
+	# Optional behavior/timing
+	samples: 250                               # optional, default: 250
+
+	# Optional triggers
+	on_raw_value:                              # optional
+		- ...                                    # x is int (median-filtered raw ADC count)
+	on_state_change:                           # optional
+		- ...                                    # x is int state code: 0 unknown, 1 A, 2 B, 3 C, 4 E/F
+
+	# Optional state thresholds (raw ADC counts)
+	state_a_threshold: 4000                    # optional, default: 4000 (A if value > this)
+	state_b_value: 3650                        # optional, default: 3650 (B if |value - this| < state_b_threshold)
+	state_b_threshold: 150                     # optional, default: 150
+	state_c_value: 3200                        # optional, default: 3200 (C if |value - this| < state_c_threshold)
+	state_c_threshold: 150                     # optional, default: 150
+	state_e_value: 755                         # optional, default: 755 (E/F if |value - this| < state_e_threshold)
+	state_e_threshold: 150                     # optional, default: 150
+```
+
+Notes on the required fields:
+- `pwm_interrupt_pin` must be the same GPIO that generates the EV CP PWM (the LEDC output pin). The component attaches a rising-edge interrupt to this pin. ESPHome
+    will most likely warn you that this pin is already in use; to avoid this warning you can add `allow_other_uses: true` to both the `ledc` and `evse_cp_sampler` pin configurations.
+- `sample_adc` must be an `adc` sensor configured with `attenuation: 12db` to cover the full ±12 V CP voltage range after appropriate voltage division and should never be left to `auto`.
+    During `evse_cp_sampler` setup, the component will override the ADC's `update_interval`, `raw`, and `sample_count` settings.
+
+#### When and how to tune the values
+
+You typically only need to tune the state thresholds if your analog front-end (divider/op-amp), ADC attenuation, or supply/reference differs from the planned schematics.
+
+Recommended tuning workflow:
+1. Temporarily enable logging of `on_raw_value` (or publish it to a diagnostic sensor) so you can observe the median-filtered raw ADC counts.
+2. Observe the stable raw counts for each CP state (A ≈ +12V, B ≈ +9V, C ≈ +6V, E/F ≈ negative CP / fault depending on your conditioning circuit).
+3. Set:
+	 - `state_b_value`, `state_c_value`, `state_e_value` to the observed centers.
+	 - `state_*_threshold` to a margin that covers noise/variation but is small enough not to overlap adjacent states.
+	 - `state_a_threshold` to a value safely above your highest observed B value (A is the only state detected as “greater than”).
+
+
 
 [releases-shield]: https://img.shields.io/github/v/release/kosl/alienevse
 [commits-shield]: https://img.shields.io/github/commit-activity/m/kosl/alienevse
