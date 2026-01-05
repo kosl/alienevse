@@ -35,6 +35,7 @@ wifi:
       password: !secret wifi_password
   output_power: 8.5dB
   power_save_mode: none  # Better reliability over power saving
+  min_auth_mode: WPA # Fixes access to some APs
 
   ap:
     ssid: "AlienEVSE Fallback Hotspot"
